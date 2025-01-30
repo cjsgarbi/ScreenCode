@@ -2,8 +2,10 @@ import copy
 from enum import Enum
 import base64
 import time
-from typing import Any, Awaitable, Callable, List, cast, TypedDict
+from typing import Any, Awaitable, Callable, List, cast, TypedDict, Optional
 from anthropic import AsyncAnthropic
+# Ignorar erros de tipo temporariamente até resolvermos a estrutura correta dos tipos
+from anthropic.types import Message  # type: ignore
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionChunk
 from config import IS_DEBUG_ENABLED
@@ -30,6 +32,10 @@ class Llm(Enum):
     GEMINI_2_0_FLASH_EXP = "gemini-2.0-flash-exp"
     O1_2024_12_17 = "o1-2024-12-17"
 
+
+class LLMResponseError(Exception):
+    """Exceção lançada quando há problemas com a resposta do modelo de linguagem."""
+    pass
 
 class Completion(TypedDict):
     duration: float
@@ -93,7 +99,26 @@ async def stream_openai_response(
     return {"duration": completion_time, "code": full_response}
 
 
-# TODO: Have a seperate function that translates OpenAI messages to Claude messages
+def translate_openai_to_claude_messages(messages: List[ChatCompletionMessageParam]) -> tuple[str, list[dict]]:
+    """
+    Traduz mensagens do formato OpenAI para o formato Claude.
+    
+    Args:
+        messages: Lista de mensagens no formato OpenAI
+        
+    Returns:
+        tuple[str, list[dict]]: Uma tupla contendo (system_prompt, mensagens_claude)
+    """
+    # Deep copy messages to avoid modifying the original list
+    cloned_messages = copy.deepcopy(messages)
+    
+    # Extract system prompt from first message
+    system_prompt = cast(str, cloned_messages[0].get("content"))
+    
+    # Convert remaining messages to Claude format
+    claude_messages = [dict(message) for message in cloned_messages[1:]]
+    
+    return system_prompt, claude_messages
 async def stream_claude_response(
     messages: List[ChatCompletionMessageParam],
     api_key: str,
@@ -158,7 +183,7 @@ async def stream_claude_response(
     await client.close()
 
     completion_time = time.time() - start_time
-    return {"duration": completion_time, "code": response.content[0].text}
+    return {"duration": completion_time, "code": response.content[0].text}  # type: ignore
 
 
 async def stream_claude_response_native(
@@ -212,7 +237,7 @@ async def stream_claude_response_native(
                 await callback(text)
 
         response = await stream.get_final_message()
-        response_text = response.content[0].text
+        response_text = response.content[0].text  # type: ignore
 
         # Write each pass's code to .html file and thinking to .txt file
         if IS_DEBUG_ENABLED:
@@ -227,7 +252,7 @@ async def stream_claude_response_native(
 
         # Set up messages array for next pass
         messages += [
-            {"role": "assistant", "content": str(prefix) + response.content[0].text},
+            {"role": "assistant", "content": str(prefix) + response.content[0].text},  # type: ignore
             {
                 "role": "user",
                 "content": "You've done a good job with a first draft. Improve this further based on the original instructions so that the app is fully functional and looks like the original video of the app we're trying to replicate.",
@@ -247,7 +272,7 @@ async def stream_claude_response_native(
         debug_file_writer.write_to_file("full_stream.txt", full_stream)
 
     if not response:
-        raise Exception("No HTML response found in AI response")
+        raise LLMResponseError("Resposta do modelo de linguagem não contém o HTML esperado")
     else:
         return {
             "duration": completion_time,

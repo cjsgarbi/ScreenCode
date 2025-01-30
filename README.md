@@ -192,5 +192,6 @@ https://github.com/abi/screenshot-to-code/assets/23818/503eb86a-356e-4dfc-926a-d
 
 **Hacker News** mas ele erra as cores no começo, então nós o cutucamos
 
-https://github.com/abi/screenshot-to-code/assets/23818/3fec0f77-44e8-4fb3-a769-ac7410315e5d#   S c r e e n C o d e  
+https://github.com/abi/screenshot-to-code/assets/23818/3fec0f77-44e8-4fb3-a769-ac7410315e5d#   S c r e e n C o d e 
+ 
  

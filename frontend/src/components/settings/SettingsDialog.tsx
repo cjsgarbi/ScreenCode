@@ -36,6 +36,26 @@ function SettingsDialog({ settings, setSettings }: Props) {
     }));
   };
 
+  React.useEffect(() => {
+    document.body.classList.add("dark");
+    document
+      .querySelector("div.mt-2")
+      ?.classList.add("dark"); // enable dark mode for sidebar
+    document
+      .querySelector('div[role="presentation"]')
+      ?.classList.add("dark"); // enable dark mode for upload container
+
+    return () => {
+      document.body.classList.remove("dark");
+      document
+        .querySelector("div.mt-2")
+        ?.classList.remove("dark"); // enable dark mode for sidebar
+      document
+        .querySelector('div[role="presentation"]')
+        ?.classList.remove("dark"); // enable dark mode for upload container
+    };
+  }, []);
+
   return (
     <Dialog>
       <DialogTrigger>

@@ -35,11 +35,15 @@ async def capture_screenshot(
         params["viewport_height"] = "832"
 
     async with httpx.AsyncClient(timeout=60) as client:
-        response = await client.get(api_base_url, params=params)
-        if response.status_code == 200 and response.content:
-            return response.content
-        else:
-            raise Exception("Error taking screenshot")
+        try:
+            response = await client.get(api_base_url, params=params)
+            if response.status_code == 200 and response.content:
+                return response.content
+            else:
+                raise Exception(f"Error taking screenshot: {response.status_code} - {response.text}")
+        except Exception as e:
+            print(f"Error taking screenshot: {e}")
+            raise Exception(f"Error taking screenshot: {e}")
 
 
 class ScreenshotRequest(BaseModel):

@@ -69,7 +69,8 @@ function App() {
       codeGenerationModel: CodeGenerationModel.CLAUDE_3_5_SONNET_2024_06_20,
       // Only relevant for hosted version
       isTermOfServiceAccepted: false,
-    },
+      geminiApiKey: null,
+    } as Settings,
     "setting"
   );
 

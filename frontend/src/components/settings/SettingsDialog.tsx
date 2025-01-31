@@ -24,11 +24,11 @@ import {
 } from "../ui/accordion";
 
 interface Props {
-  settings: Settings;
-  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  readonly settings: Settings;
+  readonly setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }
 
-function SettingsDialog({ settings, setSettings }: Props) {
+function SettingsDialog({ settings, setSettings }: Readonly<Props>) {
   const handleThemeChange = (theme: EditorTheme) => {
     setSettings((s) => ({
       ...s,
@@ -97,7 +97,7 @@ function SettingsDialog({ settings, setSettings }: Props) {
             <Input
               id="openai-api-key"
               placeholder="OpenAI API key"
-              value={settings.openAiApiKey || ""}
+              value={settings.openAiApiKey ?? ""}
               onChange={(e) =>
                 setSettings((s) => ({
                   ...s,
@@ -119,7 +119,7 @@ function SettingsDialog({ settings, setSettings }: Props) {
               <Input
                 id="openai-base-url"
                 placeholder="OpenAI Base URL"
-                value={settings.openAiBaseURL || ""}
+                value={settings.openAiBaseURL ?? ""}
                 onChange={(e) =>
                   setSettings((s) => ({
                     ...s,
@@ -142,7 +142,7 @@ function SettingsDialog({ settings, setSettings }: Props) {
             <Input
               id="anthropic-api-key"
               placeholder="Anthropic API key"
-              value={settings.anthropicApiKey || ""}
+              value={settings.anthropicApiKey ?? ""}
               onChange={(e) =>
                 setSettings((s) => ({
                   ...s,
@@ -164,7 +164,7 @@ function SettingsDialog({ settings, setSettings }: Props) {
             <Input
               id="gemini-api-key"
               placeholder="Gemini API key"
-              value={settings.geminiApiKey || ""}
+              value={settings.geminiApiKey ?? ""}
               onChange={(e) =>
                 setSettings((s) => ({
                   ...s,
@@ -196,7 +196,7 @@ function SettingsDialog({ settings, setSettings }: Props) {
                   id="screenshot-one-api-key"
                   className="mt-2"
                   placeholder="ScreenshotOne API key"
-                  value={settings.screenshotOneApiKey || ""}
+                  value={settings.screenshotOneApiKey ?? ""}
                   onChange={(e) =>
                     setSettings((s) => ({
                       ...s,
